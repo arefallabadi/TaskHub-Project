@@ -28,7 +28,6 @@ namespace TaskHub.API.Controllers
             return User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
         }
 
-        // GET: api/dashboard/admin
         [HttpGet("admin")]
         [Authorize(Roles = "Admin")]
         public IActionResult GetAdminDashboard()
@@ -37,7 +36,6 @@ namespace TaskHub.API.Controllers
             return Ok(dashboard);
         }
 
-        // GET: api/dashboard/user
         [HttpGet("user")]
         public IActionResult GetUserDashboard()
         {

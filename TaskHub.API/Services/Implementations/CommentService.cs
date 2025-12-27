@@ -38,6 +38,7 @@ namespace TaskHub.API.Services.Implementations
             }
 
             return query
+                .OrderByDescending(c => c.CreatedAt)
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .Select(c => new CommentDto

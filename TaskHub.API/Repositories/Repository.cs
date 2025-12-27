@@ -20,6 +20,11 @@ namespace TaskHub.API.Repositories.Implementations
             return _dbSet.ToList();
         }
 
+        public IQueryable<T> GetAllAsQueryable()
+        {
+            return _dbSet.AsQueryable();
+        }
+
         public T? GetById(int id)
         {
             return _dbSet.Find(id);

@@ -30,7 +30,6 @@ namespace TaskHub.API.Controllers
             return User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
         }
 
-        // GET: api/users?pageNumber=1&pageSize=10
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult GetAll([FromQuery] PaginationParams pagination)
@@ -39,7 +38,6 @@ namespace TaskHub.API.Controllers
             return Ok(users);
         }
 
-        // GET: api/users/5
         [HttpGet("{id}")]
         public IActionResult GetById(int id)
         {
@@ -70,7 +68,6 @@ namespace TaskHub.API.Controllers
             return Ok(new { Message = "User created successfully" });
         }
 
-        // PUT: api/users/5
         [HttpPut("{id}")]
         public IActionResult Update(int id, [FromBody] UpdateUserDto dto)
         {
@@ -97,7 +94,6 @@ namespace TaskHub.API.Controllers
             }
         }
 
-        // DELETE: api/users/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)

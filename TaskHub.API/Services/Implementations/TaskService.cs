@@ -1,4 +1,5 @@
-﻿using System.Security;
+﻿using System.Linq;
+using System.Security;
 using TaskHub.API.DTOs.Pagination;
 using TaskHub.API.DTOs.Task;
 using TaskHub.API.Entities;
@@ -12,23 +13,26 @@ namespace TaskHub.API.Services.Implementations
     {
         private readonly IRepository<TaskItem> _taskRepository;
         private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Comment> _commentRepository;
 
-        public TaskService(IRepository<TaskItem> taskRepository, IRepository<User> userRepository)
+        public TaskService(IRepository<TaskItem> taskRepository, IRepository<User> userRepository, IRepository<Comment> commentRepository)
         {
             _taskRepository = taskRepository;
             _userRepository = userRepository;
+            _commentRepository = commentRepository;
         }
 
         public List<TaskDto> GetAll(PaginationParams pagination, int userId, string userRole)
         {
-            var allTasks = _taskRepository.GetAll();
+            var allTasks = _taskRepository.GetAllAsQueryable();
 
             if (userRole != "Admin")
             {
-                allTasks = allTasks.Where(t => t.AssignedUserId == userId).ToList();
+                allTasks = allTasks.Where(t => t.AssignedUserId == userId);
             }
 
             var tasks = allTasks
+                .OrderByDescending(t => t.CreatedAt)
                 .Skip((pagination.PageNumber - 1) * pagination.PageSize)
                 .Take(pagination.PageSize)
                 .ToList();
@@ -102,20 +106,17 @@ namespace TaskHub.API.Services.Implementations
             if (task == null) 
                 throw new System.ArgumentException("Task not found.");
 
-            // Check if user has permission to update this task
             if (userRole != "Admin" && task.AssignedUserId != userId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to update this task.");
             }
 
-            // All users (including regular users) can update Title and Description
             if (!string.IsNullOrEmpty(dto.Title))
                 task.Title = dto.Title;
 
             if (!string.IsNullOrEmpty(dto.Description))
                 task.Description = dto.Description;
 
-            // Only Admins can update Status
             if (dto.Status != default(TaskEnum))
             {
                 if (userRole != "Admin")
@@ -125,7 +126,6 @@ namespace TaskHub.API.Services.Implementations
                 task.Status = dto.Status;
             }
 
-            // Only Admins can update AssignedUserId
             if (dto.AssignedUserId.HasValue)
             {
                 if (userRole != "Admin")
@@ -153,6 +153,13 @@ namespace TaskHub.API.Services.Implementations
             if (userRole != "Admin" && task.AssignedUserId != userId)
             {
                 throw new UnauthorizedAccessException("You do not have permission to delete this task.");
+            }
+
+            var comments = _commentRepository.GetAllAsQueryable()
+                .Where(c => c.TaskItemId == id).ToList();
+            foreach (var comment in comments)
+            {
+                _commentRepository.Delete(comment);
             }
 
             _taskRepository.Delete(task);

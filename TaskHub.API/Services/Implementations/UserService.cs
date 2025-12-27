@@ -26,7 +26,6 @@ namespace TaskHub.API.Services.Implementations
                 .Take(pagination.PageSize)
                 .ToList();
 
-            // Get all roles using repository
             var roles = _roleRepository.GetAll().ToList();
 
             return users.Select(u =>
@@ -52,7 +51,6 @@ namespace TaskHub.API.Services.Implementations
                 throw new System.UnauthorizedAccessException("You do not have permission to view this user.");
             }
 
-            // Get Role using repository
             var role = _roleRepository.GetById(user.RoleId);
             var roleName = role?.Name ?? "User";
 
@@ -102,7 +100,6 @@ namespace TaskHub.API.Services.Implementations
             if (!string.IsNullOrWhiteSpace(dto.Name))
                 user.Name = dto.Name;
 
-            // Update password if provided
             if (!string.IsNullOrWhiteSpace(dto.Password))
             {
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
@@ -116,10 +113,10 @@ namespace TaskHub.API.Services.Implementations
                     throw new System.UnauthorizedAccessException("Only Admin can change user roles.");
                 }
 
-                if (user.Id == currentUserId)
-                {
-                    throw new System.ArgumentException("Admin cannot change their own role.");
-                }
+                // if (user.Id == currentUserId)
+                // {
+                //     throw new System.ArgumentException("Admin cannot change their own role.");
+                // }
 
                 if (dto.Role != "Admin" && dto.Role != "User")
                 {

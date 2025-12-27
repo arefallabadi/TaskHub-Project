@@ -30,7 +30,6 @@ namespace TaskHub.API.Controllers
             return User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
         }
 
-        // GET: api/comments?pageNumber=1&pageSize=10&taskId=5
         [HttpGet]
         public IActionResult GetAll([FromQuery] PaginationParams pagination, [FromQuery] int? taskId)
         {
@@ -40,7 +39,6 @@ namespace TaskHub.API.Controllers
             return Ok(comments);
         }
 
-        // POST: api/comments
         [HttpPost]
         public IActionResult Create([FromBody] CommentDto dto)
         {
@@ -52,7 +50,6 @@ namespace TaskHub.API.Controllers
             return Ok(new { Message = "Comment created successfully" });
         }
 
-        // DELETE: api/comments/5
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
